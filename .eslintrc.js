@@ -13,6 +13,16 @@ module.exports = {
             group: "internal",
             position: "after",
           },
+          {
+            pattern: "@hooks/**",
+            group: "internal",
+            position: "after",
+          },
+          {
+            pattern: "@atoms/**",
+            group: "internal",
+            position: "after",
+          },
         ],
         distinctGroup: false,
       },
