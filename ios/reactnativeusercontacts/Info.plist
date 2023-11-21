@@ -27,6 +27,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
+          <string>react-native-user-contacts</string>
           <string>com.ahmed.gz.reactnativeusercontacts</string>
         </array>
       </dict>
@@ -48,6 +49,8 @@
         </dict>
       </dict>
     </dict>
+    <key>NSContactsUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your contacts</string>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>
