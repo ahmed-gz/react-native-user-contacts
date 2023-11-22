@@ -2,15 +2,30 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useAtomValue } from "jotai";
-import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import React, { useMemo } from "react";
+import {
+  ActivityIndicator,
+  SectionList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { favoriteAtom } from "@atoms/favorite";
 import { useContacts } from "@hooks/useContacts";
 
+import { mapContactsToSections } from "utils";
+
 export default function Home() {
   const { contacts, loading } = useContacts();
   const favorite = useAtomValue(favoriteAtom);
+
+  const sections = useMemo(() => {
+    return [
+      ...(favorite ? [{ title: "star", data: [favorite] }] : []),
+      ...mapContactsToSections(contacts),
+    ];
+  }, [contacts, favorite]);
 
   return (
     <View style={styles.container}>
@@ -19,21 +34,33 @@ export default function Home() {
       {loading ? (
         <ActivityIndicator />
       ) : (
-        <>
-          {favorite && (
-            <>
-              <FontAwesome name="star" size={30} color="grey" />
-              <Text key={favorite.id}>{favorite.name}</Text>
-            </>
-          )}
-          {contacts.map(({ id, name }) => (
-            <Link key={id} href={{ pathname: "details", params: { id } }}>
-              <View style={styles.row}>
-                <Text>{name}</Text>
-              </View>
+        <SectionList
+          style={styles.sectionList}
+          sections={sections}
+          renderItem={({ item: { id, firstName, middleName, lastName } }) => (
+            <Link
+              style={styles.item}
+              href={{ pathname: "details", params: { id } }}
+            >
+              <Text>
+                {[firstName, middleName, lastName].filter(Boolean).join(" ")}
+              </Text>
             </Link>
-          ))}
-        </>
+          )}
+          renderSectionHeader={({ section: { title } }) =>
+            title === "star" ? (
+              <FontAwesome
+                style={styles.sectionHeader}
+                name="star"
+                size={30}
+                color="grey"
+              />
+            ) : (
+              <Text style={styles.sectionHeader}>{title}</Text>
+            )
+          }
+          keyExtractor={({ id }) => `basicListEntry-${id}`}
+        />
       )}
     </View>
   );
@@ -47,8 +74,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  row: {
+  sectionList: {
     gap: 10,
-    flexDirection: "row",
+  },
+  sectionHeader: {
+    paddingTop: 2,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 2,
+    fontSize: 14,
+    fontWeight: "bold",
+    backgroundColor: "rgba(247,247,247,1.0)",
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
   },
 });

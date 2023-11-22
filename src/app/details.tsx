@@ -2,7 +2,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Redirect, Stack, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useAtom } from "jotai";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -14,12 +14,27 @@ import {
 import { favoriteAtom } from "@atoms/favorite";
 import { useContacts } from "@hooks/useContacts";
 
+import { findContactById } from "../utils";
+
 export default function Details() {
   const { id } = useLocalSearchParams();
   const { contacts, loading } = useContacts();
   const [favorite, setFavorite] = useAtom(favoriteAtom);
 
-  const currentContact = contacts.find((contact) => contact.id === id);
+  const currentContact = useMemo(
+    () => findContactById(contacts, id?.toString()),
+    [contacts, id],
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <StatusBar style="auto" />
+        <Stack.Screen />
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
   if (!currentContact) {
     return <Redirect href="/missing" />;
@@ -48,30 +63,24 @@ export default function Details() {
           ),
         }}
       />
-      {loading ? (
-        <ActivityIndicator />
-      ) : (
-        <>
-          <Text>Name: {name}</Text>
-          {/* <Text>
+      <Text>Name: {name}</Text>
+      {/* <Text>
             Phone Numbers:{" "}
             {phoneNumbers?.map(({ number }) => number).join(", ")}
           </Text> */}
-          <Text>Emails: {emails?.map(({ email }) => email).join(", ")}</Text>
-          <Text>Job Title: {jobTitle}</Text>
-          <Text>Company: {company}</Text>
-          <Text>Note: {note}</Text>
-          <Text>
-            Addresses:{" "}
-            {addresses
-              ?.map(
-                ({ street, city, postalCode, country }) =>
-                  `${street}, ${city}, ${postalCode}, ${country}`,
-              )
-              .join(", ")}
-          </Text>
-        </>
-      )}
+      <Text>Emails: {emails?.map(({ email }) => email).join(", ")}</Text>
+      <Text>Job Title: {jobTitle}</Text>
+      <Text>Company: {company}</Text>
+      <Text>Note: {note}</Text>
+      <Text>
+        Addresses:{" "}
+        {addresses
+          ?.map(
+            ({ street, city, postalCode, country }) =>
+              `${street}, ${city}, ${postalCode}, ${country}`,
+          )
+          .join(", ")}
+      </Text>
     </View>
   );
 }

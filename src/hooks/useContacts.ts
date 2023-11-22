@@ -1,17 +1,18 @@
 import * as Contacts from "expo-contacts";
-import { useAtom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { atomEffect } from "jotai-effect";
 
 import { contactsAtom } from "@atoms/contacts";
 
 import { MAX_CONTACTS } from "../constants";
 
+const loadingAtom = atom(true);
+
 export const useContacts = () => {
-  // TODO: memoize this
   useAtom(contactsEffect);
+
   const contacts = useAtomValue(contactsAtom);
-  // TODO: handle loading state
-  const loading = contacts.length === 0;
+  const loading = useAtomValue(loadingAtom);
 
   return { contacts, loading };
 };
@@ -26,9 +27,11 @@ const contactsEffect = atomEffect((_, set) => {
       if (status !== "granted") {
         // TODO: handle permission not granted
         console.log("Permission not granted");
+        return;
       }
 
       const { data } = await Contacts.getContactsAsync({
+        sort: Contacts.SortTypes.FirstName,
         fields: [
           Contacts.Fields.ID,
           Contacts.Fields.ContactType,
@@ -41,15 +44,18 @@ const contactsEffect = atomEffect((_, set) => {
           Contacts.Fields.Note,
         ],
       });
-      // TODO: handle sorting
 
       if (mounted) {
         set(contactsAtom, data.slice(0, MAX_CONTACTS));
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      set(loadingAtom, false);
     }
   })();
 
-  return () => (mounted = false);
+  return () => {
+    mounted = false;
+  };
 });
