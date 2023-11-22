@@ -1,16 +1,28 @@
-import { SplashScreen, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { Provider } from "jotai";
 import React from "react";
+import {
+  SafeAreaView,
+  StatusBar as StatusBarRN,
+  StyleSheet,
+} from "react-native";
 
 export { ErrorBoundary } from "@components/error-boundary";
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   return (
     <Provider>
-      <Stack />
+      <SafeAreaView style={styles.container}>
+        <Stack />
+      </SafeAreaView>
     </Provider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: StatusBarRN.currentHeight,
+    backgroundColor: "#fff",
+  },
+});
