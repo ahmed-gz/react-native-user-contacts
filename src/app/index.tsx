@@ -5,7 +5,10 @@ import { useAtomValue } from "jotai";
 import React, { useMemo } from "react";
 import {
   ActivityIndicator,
+  Pressable,
   SectionList,
+  SectionListData,
+  SectionListRenderItemInfo,
   StyleSheet,
   Text,
   View,
@@ -13,8 +16,10 @@ import {
 
 import { favoriteAtom } from "@atoms/favorite";
 import { useContacts } from "@hooks/useContacts";
+import { Avatar } from "@components/avatar";
 
-import { mapContactsToSections } from "utils";
+import { Contact } from "../types";
+import { mapContactsToSections } from "../utils";
 
 export default function Home() {
   const { contacts, loading } = useContacts();
@@ -35,34 +40,44 @@ export default function Home() {
         <ActivityIndicator />
       ) : (
         <SectionList
-          style={styles.sectionList}
           sections={sections}
-          renderItem={({ item: { id, firstName, middleName, lastName } }) => (
-            <Link
-              style={styles.item}
-              href={{ pathname: "details", params: { id } }}
-            >
-              <Text>
-                {[firstName, middleName, lastName].filter(Boolean).join(" ")}
-              </Text>
-            </Link>
-          )}
-          renderSectionHeader={({ section: { title } }) =>
-            title === "star" ? (
-              <FontAwesome
-                style={styles.sectionHeader}
-                name="star"
-                size={30}
-                color="grey"
-              />
-            ) : (
-              <Text style={styles.sectionHeader}>{title}</Text>
-            )
-          }
+          renderSectionHeader={SectionHeader}
+          renderItem={SectionItem}
           keyExtractor={({ id }) => `basicListEntry-${id}`}
         />
       )}
     </View>
+  );
+}
+
+function SectionHeader({
+  section: { title },
+}: {
+  section: SectionListData<Contact, { title: string }>;
+}) {
+  return title === "star" ? (
+    <FontAwesome style={styles.sectionHeader} name="star" color="black" />
+  ) : (
+    <Text style={styles.sectionHeader}>{title}</Text>
+  );
+}
+
+function SectionItem({
+  item: { id, name, firstName, middleName, lastName },
+}: SectionListRenderItemInfo<Contact>) {
+  return (
+    <Link href={{ pathname: "details", params: { id } }} asChild>
+      <Pressable>
+        {({ pressed }) => (
+          <View style={[styles.item, pressed && { backgroundColor: "#ccc" }]}>
+            <Avatar name={name} variant="small" />
+            <Text>
+              {[firstName, middleName, lastName].filter(Boolean).join(" ")}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+    </Link>
   );
 }
 
@@ -74,21 +89,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  sectionList: {
-    gap: 10,
-  },
   sectionHeader: {
-    paddingTop: 2,
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 2,
-    fontSize: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    fontSize: 24,
     fontWeight: "bold",
-    backgroundColor: "rgba(247,247,247,1.0)",
+    backgroundColor: "rgb(225 225 225)",
   },
   item: {
-    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     fontSize: 18,
-    height: 44,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
   },
 });

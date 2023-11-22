@@ -1,35 +1,16 @@
 import { ErrorBoundaryProps } from "expo-router";
-import {
-  Platform,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
-  console.log("ErrorBoundary error", error);
+  console.error(error);
   // TODO: Send error to Sentry or similar error tracking service.
 
   return (
     <View style={styles.container}>
-      <SafeAreaView
-        style={{ flex: 1, gap: 8, maxWidth: 720, marginHorizontal: "auto" }}
-      >
-        <View
-          style={{
-            marginBottom: 12,
-            flexDirection: "row",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text role="heading" aria-level={1} style={styles.title}>
-            Something went wrong
-          </Text>
-        </View>
+      <SafeAreaView style={{ gap: 50 }}>
+        <Text role="heading" aria-level={1} style={styles.title}>
+          Something went wrong
+        </Text>
 
         <Pressable onPress={retry}>
           {({ pressed }) => (
@@ -62,13 +43,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "black",
     padding: 24,
-    alignItems: "stretch",
+    alignItems: "center",
     justifyContent: "center",
   },
   title: {
     color: "white",
-    fontSize: Platform.select({ web: 32, default: 24 }),
+    fontSize: 20,
     fontWeight: "bold",
+    textAlign: "center",
   },
   buttonText: {
     fontSize: 18,
