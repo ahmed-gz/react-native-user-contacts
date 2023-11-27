@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 5.9.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview1": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "ANDROID_SDK_ROOT": "/home/ahmed/Android/sdk"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
